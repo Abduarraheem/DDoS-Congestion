@@ -37,13 +37,13 @@ int main(int argc, char **argv){
     cout << cmd << endl;
 
     while(getline(file, line)){
+        line = line.substr(0, line.length()-1);
         command = "ip addr add " + line + "/24 dev enp0s3";
         cmd = &command[0];
         system(cmd);
         int index = line.find_last_of('.');
 
         string ip = line.substr(0, index+1) + "0";
-
         command = "ip route delete " + ip + "/24";
         cmd = &command[0];
         system(cmd);
@@ -56,7 +56,3 @@ int main(int argc, char **argv){
     file.close();
     return 0;
 }
-// ip route add default via 192.168.56.180 dev enp0s3
-// ip addr add 72.20.13.14/24 dev enp0s3
-// ip route delete 72.20.13.0/24
-// ip route add 72.20.13.0/24 via 192.168.56.180
