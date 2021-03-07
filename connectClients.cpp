@@ -27,7 +27,7 @@ void usage(){
 	cout << "Usage:" << endl;
 	cout << "Generate client connection: " << endl;
 	cout << "\tUsage: ./programName -c <Destination IPs File>";
-	cout << " <Source IPs File> <time in seconds for simulation> " << endl;
+	cout << " <Source IPs File> <time in seconds for simulation> [OPTIONAL]<bandwidth>" << endl;
 }
 
 int countIPS(string ipFileName){
@@ -76,11 +76,10 @@ int fillIPArray(string ipFileName, string *ipArr, int ipArrSize){
 	return 1;
 }
 
-int simulateClientFlow(string Dest, string Source, string simDuration) {
+int simulateClientFlow(string Dest, string Source, string simDuration, string bandwidth) {
 	// count up numbers of destination and source IPs to expect
 	int numDest = countIPS(Dest);
 	int numSource = countIPS(Source);
-	
 	// initialize our string arrays of IPs as well as our port array
 	string destIPS[numDest];
 	string sourceIPS[numSource];
@@ -139,7 +138,7 @@ int simulateClientFlow(string Dest, string Source, string simDuration) {
 
 				//connect Client
 				string testDurStr = to_string(cITR);
-				string command = "./iperf2 -c " + threads[i].destIP +
+				string command = "./iperf2 -c " + threads[i].destIP + " -d -b " + bandwidth +
 				                 " -B " + threads[i].sourceIP + "-t " +
 				                 testDurStr + " > /dev/null 2>&1 &";
 				cmd = &command[0];
@@ -167,13 +166,17 @@ int simulateClientFlow(string Dest, string Source, string simDuration) {
 int main(int argc, char **argv) {
 	if (argc > 2 and strcmp(argv[1], "-c") == 0) {
 		cout << "-c flag found" << endl;
-		if (argc != 5) {
+		if (argc > 6) {
 			cout << "invalid amount of arguments" << endl;
 			usage();
 			return -1;
 		}
+		string bandwidth = "3"; // default bandwidth.
+		if (argc > 5){
+			bandwidth = argv[5];
+		}
 		cout << "beginning client connection simulation" << endl;
-		simulateClientFlow(argv[2],argv[3], argv[4]);
+		simulateClientFlow(argv[2],argv[3], argv[4], bandwidth);
 		return 1;
 	}
 	
