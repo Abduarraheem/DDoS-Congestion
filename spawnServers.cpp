@@ -39,11 +39,37 @@ int countIPS(string ipFileName){
 	return ipCount;
 }
 
+int fillIPArray(string ipFileName, string *ipArr, int ipArrSize){
+	string line;
+	fstream ipFile;
+	int ipCount = 0;
+
+	// open ip File
+	ipFile.open(ipFileName);
+	if (ipFile.fail()){
+		// if failed to open ipFile return error
+		return -1;
+	}
+	// read through file and return IP count
+	while(getline(ipFile, line)){
+		if (ipCount == ipArrSize){
+			break;
+		}
+		ipArr[ipCount] = line;
+		ipCount++;
+	}
+
+	ipFile.close();
+	return 1;
+}
 
 int generateServers(string Destinations){
 	// count up number of Destination ips
 	int numDest = countIPS(Destinations);
-	cout << "numDest" << numDest << endl;
+	// create list of destination IPS
+	string destIPS[numDest];
+	fillIPArray(Destinations, destIPS, numDest);
+
 
 	// start up an iperf2 server in the background for ever dest IP
 	// starting at port 5001
@@ -54,7 +80,7 @@ int generateServers(string Destinations){
 	for (int i = 0; i < numDest; i++) {
 		int portNumber = 5001 + i;
 		string portStr  = to_string(portNumber);
-		string command = "./iperf2 -s -D -p " + portStr;
+		string command = "./iperf2 -s -D -p " + portStr + " -B " + destIPS[i];
 		cmd = &command[0];
 		system(cmd);
 	}
