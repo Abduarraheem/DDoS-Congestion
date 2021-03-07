@@ -55,6 +55,7 @@ int fillIPArray(string ipFileName, string *ipArr, int ipArrSize){
 		if (ipCount == ipArrSize){
 			break;
 		}
+		line = line.substr(0, line.length()-1);
 		ipArr[ipCount] = line;
 		ipCount++;
 	}
