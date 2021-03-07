@@ -13,13 +13,21 @@
 
 using namespace std;
 
-
+class Thread {
+	public:
+		int status; // 0 for active 1 for ready to connect
+    	string sourceIP; // Source Ip they're associated to
+		string destIP; // Destination IP they're currently assigned to
+		time_t timeStamp;
+		int testDuration; // how long process is going. Will compare to time stamp
+		                  // to see if thread is done. 
+};
 
 void usage(){
 	cout << "Usage:" << endl;
 	cout << "Generate client connection: " << endl;
 	cout << "\tUsage: ./programName -c <Destination IPs File>";
-	cout << " <Source IPs File> <time in minutes for simulation> " << endl;
+	cout << " <Source IPs File> <time in seconds for simulation> " << endl;
 }
 
 int countIPS(string ipFileName){
@@ -86,14 +94,73 @@ int simulateClientFlow(string Dest, string Source, string simDuration) {
 		string portStr = to_string(portNumber);
 		ports[i] = portStr;
 	}
-
 	
-	/* Still to Do:
-		-Run program for user specified time
-		- While running randomize indexes of portnumbers, and 
-		    source/ Destination IP adresses as well as a random
-		    runtimes and sleep times
-		- System commands should be ran in background. */
+	//initialize threads table
+	Thread threads[numSource];
+
+	for (int i = 0; i < numSource; i++) {
+		//cout << "i: " << i << endl;
+		Thread t;
+		t.status = 0;
+		t.sourceIP = "";
+		t.destIP = "";
+		time(&(t.timeStamp));
+		t.testDuration = 0;
+		threads[i] = t;	
+	}
+	
+
+
+	int testDur = stoi(simDuration); // testDuration set by user
+
+	time_t start, currentT;
+	time(&start);
+	time(&currentT);
+
+	// run for the user specified amount of time (in seconds)
+	while(difftime(currentT, start) < testDur) {
+		// iterate through every thread in the thread table
+		char * cmd;
+		for (int i = 0; i < numSource; i++) {
+			if (threads[i].status == 0) {
+				// thread is currently not active
+				// time to assign it values
+				
+				// randomizing values
+				int sIDX = rand() % numSource; //source Index
+				int dIDX = rand() % numDest; // destination Index
+				int cITR = rand() % 119 + 1; // Intervals can range between 1 and 119 seconds 
+
+				// update thread and start process
+				threads[i].status = 1; // thread will now be active
+				threads[i].sourceIP = sourceIPS[sIDX];
+				threads[i].destIP = destIPS[dIDX];
+				threads[i].testDuration = cITR;
+
+				//connect Client
+				string testDurStr = to_string(cITR);
+				string command = "./iperf2 -c " + threads[i].destIP +
+				                 " -B " + threads[i].sourceIP + "-t " +
+				                 testDurStr + " > /dev/null 2>&1 &";
+				cmd = &command[0];
+				system(cmd);
+				time(&(threads[i].timeStamp)); // want to mark timestamp after process starts
+			}
+			else {
+				// thread is currently active (check to see if its done)
+				time_t cur;
+				time(&cur);
+				if (difftime(cur, threads[i].timeStamp) > threads[i].testDuration){
+					// thread is done 
+					threads[i].status = 0; // make it available
+				}
+				else {
+					// thread is not done. Let it continue working
+					continue;
+				}
+			}
+		}
+	}
 	return 1;
 }
 
