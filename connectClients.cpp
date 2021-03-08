@@ -68,6 +68,7 @@ int fillIPArray(string ipFileName, string *ipArr, int ipArrSize){
 		if (ipCount == ipArrSize){
 			break;
 		}
+		// line = line.substr(0, line.length()-1);
 		ipArr[ipCount] = line;
 		ipCount++;
 	}
@@ -115,9 +116,10 @@ int simulateClientFlow(string Dest, string Source, string simDuration, string ba
 	time_t start, currentT;
 	time(&start);
 	time(&currentT);
-
+	// ofstream output("output.txt");
 	// run for the user specified amount of time (in seconds)
 	while(difftime(currentT, start) < testDur) {
+		time(&currentT);
 		// iterate through every thread in the thread table
 		char * cmd;
 		for (int i = 0; i < numSource; i++) {
@@ -138,10 +140,11 @@ int simulateClientFlow(string Dest, string Source, string simDuration, string ba
 
 				//connect Client
 				string testDurStr = to_string(cITR);
-				string command = "./iperf2 -c " + threads[i].destIP + " -d -b " + bandwidth +
-				                 " -B " + threads[i].sourceIP + "-t " +
+				string command = "iperf -c " + threads[i].destIP + " -b -d " + bandwidth +
+				                 " -B " + threads[i].sourceIP + " -t " +
 				                 testDurStr + " > /dev/null 2>&1 &";
 				cmd = &command[0];
+				// output << cmd << endl;
 				system(cmd);
 				time(&(threads[i].timeStamp)); // want to mark timestamp after process starts
 			}
@@ -160,6 +163,7 @@ int simulateClientFlow(string Dest, string Source, string simDuration, string ba
 			}
 		}
 	}
+	// output.close();
 	return 1;
 }
 
