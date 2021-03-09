@@ -140,21 +140,12 @@ int simulateClientFlow(string Dest, string Source, string simDuration, string ba
 
 				//connect Client
 				string testDurStr = to_string(cITR);
-<<<<<<< HEAD
 				string command = "iperf -c " + threads[i].destIP + " -d -b " + bandwidth +
-=======
-				string command = "iperf -c " + threads[i].destIP + " -b -d " + bandwidth +
->>>>>>> 339ab3f294104bdfad87674669f740e0c4cc4a39
 				                 " -B " + threads[i].sourceIP + " -t " +
 				                 testDurStr + " > /dev/null 2>&1 &";
 				cout << "Destination IP: " + threads[i].destIP + ", Source IP: " + threads[i].sourceIP << endl;
 			
 				cmd = &command[0];
-<<<<<<< HEAD
-				cout << cmd << endl;
-=======
-				// output << cmd << endl;
->>>>>>> 339ab3f294104bdfad87674669f740e0c4cc4a39
 				system(cmd);
 				time(&(threads[i].timeStamp)); // want to mark timestamp after process starts
 			}

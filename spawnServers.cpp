@@ -55,7 +55,7 @@ int fillIPArray(string ipFileName, string *ipArr, int ipArrSize){
 		if (ipCount == ipArrSize){
 			break;
 		}
-		line = line.substr(0, line.length()); #Removal of -1 for Eugene and Jackson
+		line = line.substr(0, line.length());
 		ipArr[ipCount] = line;
 		ipCount++;
 	}
@@ -81,7 +81,7 @@ int generateServers(string Destinations){
 	for (int i = 0; i < numDest; i++) {
 		int portNumber = 5001 + i;
 		string portStr  = to_string(portNumber);
-		string command = "iperf -s -D -p " + portStr + " -B " + destIPS[i]; #/iperf2 -> iperf to reflect change
+		string command = "iperf -s -D -p " + portStr + " -B " + destIPS[i];
 		cmd = &command[0];
 		system(cmd);
 	}
