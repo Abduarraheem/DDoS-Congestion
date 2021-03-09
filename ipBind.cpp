@@ -37,7 +37,7 @@ int main(int argc, char **argv){
     cout << cmd << endl;
 
     while(getline(file, line)){
-        line = line.substr(0, line.length()-1);
+        line = line.substr(0, line.length());
         command = "ip addr add " + line + "/24 dev enp0s3";
         cmd = &command[0];
         system(cmd);
