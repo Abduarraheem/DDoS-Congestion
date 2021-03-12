@@ -1,3 +1,16 @@
+/* 
+Description: This CPP file reads two user specified files containing
+source and destination IP addresses and then makes iperf connections
+to running servers (spawned using spawnServers.cpp on another machine)
+for a user specified amount of time.
+
+Authors: Eugene Tan, Abduarraheem Elfandi, Jackson Klagge
+
+Group Project Name:
+   DDoS-DELS (Distributed Denial of Service Detection Evaluatin in Linux Systems)
+
+Course: CIS 433 Computer and Network Security
+*/
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -14,16 +27,23 @@
 using namespace std;
 
 class Thread {
+	/*
+	Description: class to simulate a thread. 
+	*/
 	public:
 		int status; // 0 for active 1 for ready to connect
-    	string sourceIP; // Source Ip they're associated to
-		string destIP; // Destination IP they're currently assigned to
-		time_t timeStamp;
-		int testDuration; // how long process is going. Will compare to time stamp
-		                  // to see if thread is done. 
+    	string sourceIP; // Source Ip Address
+		string destIP; // Destination IP Address
+		time_t timeStamp; // time process begins
+		int testDuration; // will be used to calculate when process is done
+		                  
 };
 
 void usage(){
+	/*
+	Description: Prints message to stdout to let the user how to use
+		serverSpawns
+	*/
 	cout << "Usage:" << endl;
 	cout << "Generate client connection: " << endl;
 	cout << "\tUsage: ./programName -c <Destination IPs File>";
@@ -31,6 +51,18 @@ void usage(){
 }
 
 int countIPS(string ipFileName){
+	/*
+	Description: Reads an ipFile of and returns the number of IP addresses
+		contained in that file (This file makes the assumption the each IP addr
+		is its own line).
+	Paramaters: 
+		string: the name of the file the program will open and read
+	Returns:
+		int: 
+			ipCount: number of addresses in file or
+		         -1: failure (couldn't read file)
+	*/
+
 	// initialize line buffer, file object, and ip Counter
 	string line;
 	fstream ipFile;
@@ -53,6 +85,19 @@ int countIPS(string ipFileName){
 
 
 int fillIPArray(string ipFileName, string *ipArr, int ipArrSize){
+	/*
+	Description: Reads an ipFile line by line and stores that line
+		(an IP address) into a string array.
+	Parameters:
+		string: name of IPFile that will be opened and read
+		string *: string array where IP addresses (read from ipFileName)
+					will be stored
+		int: size of the string array ipArr
+	Returns:
+		int: function return status
+			1: for success
+		   -1: for failure (couldn't read file or file is going past array size)
+	*/
 	string line;
 	fstream ipFile;
 	int ipCount = 0;
@@ -78,9 +123,33 @@ int fillIPArray(string ipFileName, string *ipArr, int ipArrSize){
 }
 
 int simulateClientFlow(string Dest, string Source, string simDuration, string bandwidth) {
-	// count up numbers of destination and source IPs to expect
+	/*
+	Description: For a user defined amount of time this program makes
+	client connections to a server (assumption that servers are running
+	a different machine) using system calls of IPERF. Parmaters for the
+	Iperf system calls are IP addresses from Dest and Source files
+	and bandwidth which are provide by the user as parameters.
+	Parameters:
+		string: Name of file containing destination ip addresses that 
+				will serve as clients for calls to iperf
+		string: Name of file containing source ip addresses that
+				will serve as binding ips for calls to iperf 
+		string: amount (in seconds) that the simulation will run ipef
+				commands
+		string: bandwidth that iperf client side will use for the simulation
+	Return:
+		int: function status
+			 1: success
+			-1: failure (couldn't read destination or source file)
+
+		*/
 	int numDest = countIPS(Dest);
 	int numSource = countIPS(Source);
+	if (numDest == -1 or numSource == -1) {
+		// problem reading the file
+		return -1;
+	}
+
 	// initialize our string arrays of IPs as well as our port array
 	string destIPS[numDest];
 	string sourceIPS[numSource];
@@ -169,6 +238,18 @@ int simulateClientFlow(string Dest, string Source, string simDuration, string ba
 }
 
 int main(int argc, char **argv) {
+	/*
+	Description: Makes sure the user gives the correct amount of
+	arguments to simulate client flow and then proceeds to simulate
+	Clients:
+		int: argument count
+		char**: arguments the user will give to run the program
+				(see usage for what argv should have) 
+	Return:
+		int: status of program
+			 1: success
+			-1: user didn't give the correct amount of arguments 
+	*/	
 	if (argc > 2 and strcmp(argv[1], "-c") == 0) {
 		cout << "-c flag found" << endl;
 		if (argc > 6) {

@@ -1,3 +1,16 @@
+/* 
+Description: This CPP file reads a user specified file containing IP
+addresses and then generates n (the number of IP's in the file) servers
+in the background bounded to these IP addresses using the IPERF system
+calls.
+
+Authors: Eugene Tan, Abduarraheem Elfandi, Jackson Klagge
+
+Group Project Name:
+   DDoS-DELS (Distributed Denial of Service Detection Evaluatin in Linux Systems)
+
+Course: CIS 433 Computer and Network Security
+*/
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -13,12 +26,28 @@
 using namespace std;
 
 void usage(){
+	/*
+	Description: Prints message to stdout to let the user how to use
+		serverSpawns
+	*/
 	cout << "Usage:" << endl;
 	cout << "Spawn Servers: " << endl;
 	cout << "\tUsage: ./programName -s <Destination IPs File>" << endl;
 }
 
 int countIPS(string ipFileName){
+	/*
+	Description: Reads an ipFile of and returns the number of IP addresses
+		contained in that file (This file makes the assumption the each IP addr
+		is its own line).
+	Paramaters: 
+		string: the name of the file the program will open and read
+	Returns:
+		int: 
+			ipCount: number of addresses in file or
+		         -1: failure (couldn't read file)
+	*/
+
 	// initialize line buffer, file object, and ip Counter
 	string line;
 	fstream ipFile;
@@ -40,6 +69,20 @@ int countIPS(string ipFileName){
 }
 
 int fillIPArray(string ipFileName, string *ipArr, int ipArrSize){
+	/*
+	Description: Reads an ipFile line by line and stores that line
+		(an IP address) into a string array.
+	Parameters:
+		string: name of IPFile that will be opened and read
+		string *: string array where IP addresses (read from ipFileName)
+					will be stored
+		int: size of the string array ipArr
+	Returns:
+		int: function return status
+			1: for success
+		   -1: for failure (couldn't read file or file is going past array size)
+	*/
+
 	string line;
 	fstream ipFile;
 	int ipCount = 0;
@@ -65,8 +108,26 @@ int fillIPArray(string ipFileName, string *ipArr, int ipArrSize){
 }
 
 int generateServers(string Destinations){
+	/*
+	Description: Creates n (# of IP addresses in Destinations) servers
+		in the users background using system calls to iperf.  
+	Parameters:
+		string: name of IPFile containing destination addresses
+	Return:
+		int: function status
+			1: success
+		   -1: Destination file couldn't be read
+
+
+	*/
+
 	// count up number of Destination ips
 	int numDest = countIPS(Destinations);
+	if (numDest == -1) {
+		// countIPS couldn't read Destination file so
+		// we should exit function
+		return -1;
+	}
 	// create list of destination IPS
 	string destIPS[numDest];
 	fillIPArray(Destinations, destIPS, numDest);
@@ -91,6 +152,20 @@ int generateServers(string Destinations){
 
 
 int main(int argc, char **argv) {
+	/*
+	Description: Makes sure the user gives the correct amount of
+	arguments to run spawnServers and then proceeds to spawn Servers
+	Parameters:
+		int: argument count
+		char**: arguments the user will give to run the program
+				(see usage for what argv should have) 
+	Return:
+		int: status of program
+			 1: success
+			-1: user didn't give the correct amount of arguments 
+	*/	
+
+	// make user gives the correct amount of arguments
 	if (argc > 2 and strcmp(argv[1], "-s") == 0) {
 		cout << "-s flag found" << endl;
 		if (argc != 3) {
