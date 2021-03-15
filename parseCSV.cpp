@@ -1,3 +1,16 @@
+/* 
+Description: This CPP file reads a CSV file (containing ip connect and
+event logs) and parses the IP addresses into source and destination ip
+files. 
+
+Authors: Eugene Tan, Abduarraheem Elfandi, Jackson Klagge
+
+Group Project Name:
+   DDoS-DELS (Distributed Denial of Service Detection Evaluatin in Linux Systems)
+
+Course: CIS 433 Computer and Network Security
+*/
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -9,9 +22,28 @@
 using namespace std;
 
 void usage(){
+	/*
+	Description: Prints message to stdout to let the user how to use
+		parseCSV
+	*/
     cout << "Usage: ./<prog name> <CSV file name>" << endl;
 }
 int main(int argc, char **argv){
+	/*
+	Description: Reads a CSV file (argv[1]) and looks for lines with
+	connection events. It then parses that lines IP addresses into a
+	source and destination IP set.After going through the CSV File the
+	source and destination IP sets are written into two new files:
+	Source.ips and Destination.ips.
+	Parameters:
+		int: argument count
+		char**: arguments the user will give to run the program
+				(see usage for what argv should have)
+	Return:
+		int: program status
+			-1: failed (failed to open file or user arguments are invalid)
+			 1: Success  
+	*/
     if (argc < 2){
         usage();
         return -1;

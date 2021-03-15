@@ -241,7 +241,8 @@ int main(int argc, char **argv) {
 	/*
 	Description: Makes sure the user gives the correct amount of
 	arguments to simulate client flow and then proceeds to simulate
-	Clients:
+	Clients
+	Parameters:
 		int: argument count
 		char**: arguments the user will give to run the program
 				(see usage for what argv should have) 
