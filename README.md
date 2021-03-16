@@ -4,47 +4,76 @@
 ## Requirements
 <p>This project was developed on multiple VM's on Oracle Virtual Box with Ubuntu 20.04 operating system as the choice OS for the VMs. A user must have at least two Ubuntu 20.04 VM installed (one will host servers and the other will host clients). The user can also have more VMS installed if, for instance, they want to use the environment for a DDoS-Attack (a third VM and inject one of the other two with a DDoS-attack). Note: These VM's Should be on host-only network to ensure it is a closed network for texting purposes. <p>
 
-<p>All requirements for this project are taken care of in the two shell files requirements.sh and mimic-install-build.sh. The user will simply have to run these scripts to get install all dependencies for the project. <p>
+<p> Requirements for this project includes : <p>
 
-<P>Run in DDoS-Congestion Directory:
-	'''bash
+*	g++
+*	iperf
+*   Ifupdown
+*   Net-tools
+*   VIM (Or text editor of choice)
+*	Nload
+*	Cmake 
+*	git (to download mimic repo)
+*	libwandio (in order to run mimic)
+*	libtrace (in order to run mimic)
+
+<p>All requirements (except for the text editor of choice) for this project are taken care of in the two shell files requirements.sh and mimic-install-build.sh. The user will simply have to run these scripts to get install all dependencies for the project. <p>
+
+<P> Run in DDoS-Congestion Directory:
+
 		sh requirements.sh
 		sh mimic-install-build.sh
-	'''
 <p>
+
 
 ## Build
 1. Run the above commands in the Requirements section to ensure they have all the project's dependencies installed.
 2. Compile the CPP files into executables:
-	<p>'''bash
+
 		g++ -o parseCSV parseCSV.cpp
 		g++ -o ipBind parseCSV.cpp
 		g++ -o spawnServers spawnServers.cpp
 		g++ -o connectClients connectClients.cpp
-	'''
-	<p> <p> Note: the user can just compile spawnServers.cpp on the machine that will hold the servers(The same can be said for connectClients.cpp). <p>
+
+ <p> Note: the user can just compile spawnServers.cpp on the machine that will hold the servers(The same can be said for connectClients.cpp). <p>
 
 ## Programs
 *	ParseCSV.cpp: reads a CSV file (containing ip connect and
 event logs) and parses the IP addresses into source and destination ip
-files. <p> '''cpp
-	 		  Usage: ./<prog name> <CSV file name>
-	 	''' <p> 
+files.
+
+<p>Usage:
+
+	./<prog name> <CSV file name>
+<p> 
 
 *	ipBind.cpp: reads a file containig IP addresses and binds
-them to the hosts machine using a default routing IP (specified by the user). <p>'''Usage: ./<prog name> <file name> <default routing IP>''' <p>
+them to the hosts machine using a default routing IP (specified by the user). 
+
+<p> Usage:
+
+	./<prog name> <.ips File name> <default routing IP>
+<p>
 
 *	spawnServers.cpp: reads a user specified file containing IP
 addresses and then generates n (the number of IP's in the file) servers
 in the background bounded to these IP addresses using the IPERF system
 calls.
-	<p>'''Usage: ./programName -s <Destination IPs File> ''' <p>
+
+<p> Usage:
+
+	./<prog name> -s <Destination ips File Name>
+<p>
 
 *	connectClients.cpp: reads two user specified files containing
 source and destination IP addresses and then makes iperf connections
 to running servers (spawned using spawnServers.cpp on another machine)
 for a user specified amount of time.
-	<p> '''Usage: ./programName -c <Destination IPs File> <Source IPs File> <time in seconds for simulation> [OPTIONAL]<bandwidth>''' <p>
+
+<p> Usage:
+
+	./<prog name> -c <Destination ips File Name> <Source ips File Name> <time in seconds for simulation> [OPTIONAL]<bandwidth>
+<p>
 
 
 
@@ -59,24 +88,22 @@ for a user specified amount of time.
 1. If this option doesn't show up you will have to create a host network. To do this back out to the start of Oracle VM Virtualbox Manager and click on "File" in the top left corner. Then click "Network Host Network Manager". From there you can create your own host Network. Once creating the host network the "host-only Adapter" option from part 1 should appear.
 
 
-1. Set up static IP address by going to /etc/network:
-	'''bash
-	cd /etc/network
-	'''
+1. 	Set up static IP address by going to /etc/network:
+
+		cd /etc/network
+
  and configuring a default IP address by changing the the file to the following:
-	'''
-	# Include files from /etc/network/interfaces.d:
-    #source-directory /etc/network/interfaces.d
 
-    auto lo 
-	iface lo inet loopback
+		# Include files from /etc/network/interfaces.d:
+    	#source-directory /etc/network/interfaces.d
+    	auto lo 
+		iface lo inet loopback
+		auto enp0s3
+		allow-hotplug enp0s3
+		iface enp0s3 inet static
+		address 192.168.56.100
+		netmask 255.255.255.0
 
-	auto enp0s3
-	allow-hotplug enp0s3
-	iface enp0s3 inet static
-	address 192.168.56.100
-	netmask 255.255.255.0
-	'''
 	<p>Where enp0s3 is the default device and 192.168.56.100 will be
 	the static IP address of the default device (Note: If the user wants have a different IP address or they have a different device they wish to use they can just replace the device where enp0s3 appears and the ip address where 192.168.56.100 appears.). This process should be done on both server and client VMs and the two must have different static IP addresses.<p>
 	<p> After reboot the changes should be made. One thing to take note of this will completely isolate your VMs outside of the closed network.Once this process is completed the user is ready to run the project.
@@ -84,49 +111,49 @@ for a user specified amount of time.
 	<p>NOTE: If a user wishes to get their VM back online all they have to do is switch the VM's network back NAT (found where host-only adapter was found the closed network section) and comment out the contents of the interfaces file. <p>
 
 1. Make sure ip addresses are defualt gateways fore each VM. To do this the user just needs to run the following command:
-	<p>'''Bash
+	
 		sudo route add default gw <current machines static IP address>
-		'''
-	<p>
 
 ### Runthrough Example
 
-<p> Once both machines are set up by following the instruction above, our program can be ran. To start our program we need a CSV file that has the same format as Collective-collection-AJE.csv. This format can be spawned by using mimics extract feature on a PCAP file. For more information on mimics functionality please read up on its documentation which can be found in the mimic directory (which is created when the user runs mimic-install-build.sh). For this example we will use Collective-collection-AJE.csv as an example CSV File. We
-will also be using the names of the executables listed in the build section. <p>
+<p> Once both machines are set up by following the instruction above, our program can be ran.To start our program we will need a CSV file that contains connection and events between IP addresses. To gain this CSV test file we use mimics extract feature on a PCAP file. For more information on mimics functionality please read up on its documentation which can be found in the mimic directory (which is created when the user runs mimic-install-build.sh). For this example we will use sample.CSV as an example CSV File. This is just a place holder name for an actual CSV file. A correctly inputted CSV format should have the following format as this example:
+
+	CONN,2,76.10.22.63,49674,->,52.230.222.68,443,10.495166
+	EVENT,2,0,76.10.22.63,SEND,101,0,14.495166
+
+A CSV file outputted by mimic's extract feature will have this format. We will also be using the names of the executables listed in the build section. With our environment set up, CSV FILE in hand, and our executables ready we can run through the program. <p>
 
 1.	Parse CSV FIle:
-	'''BASH
-	./parseCSV Collective-collection-AJE.csv
-	'''
+	
+		./parseCSV sample.CSV
+
 	<p>Note this will create two ips files (source.ips and destination.ips). This will have to be ran on both machines or the ip files must be shared with both machines. <p>
 
 1.	Bind IPs on both Machines:
-	<p>On VM A (client VM) whose static ip address is 192.168.56.100 bind the source ips to the machine <p>
-		<p> '''BASH
-			./ipBind Source.ips 192.168.56.100
-			'''
-		<p>
-	<p>On VM B (server VM) whose static ip address is 192.168.56.180
-		bind the destination ips to the machine <p>
-		<p> '''BASH
-			./ipBind Destination.ips 192.168.56.180
-			'''
-		<p>
-1.	Start up servers
-	<p> On VM B run spawnServers to create n (number of ips in destination.ips) servers running in the background.
-	<p>
-		<p> '''BASH
-			./spawnServers -s Destination.ips
-			'''
-		<p>
-1.	Connect clients to servers
-	<p> On VM A run connectClients to generate traffic between the two VMs for a user specified amount of time (in seconds). For this example the clients will talk to the servers for 60 seconds and the default bandwidth between the connections will be used.
-	<p>
-		<p> '''BASH
-			./connectClients -c Destination.ips Source.ips 60
-		<p>
+	<p>On VM A (client VM) whose static ip address is 192.168.56.100 bind the source ips to the machine:
 
-Note: After the user is done running tests the servers will still be up and running on VM B. The user should kill all iperf processes once they are done.
-<p> '''BASH
-		sudo kill all -9 iperf
-	'''' <p> 
+		./ipBind Source.ips 192.168.56.100
+	<p>
+
+	<p>On VM B (server VM) whose static ip address is 192.168.56.180
+		bind the destination ips to the machine: 
+
+		./ipBind Destination.ips 192.168.56.180
+	<p>
+
+1.	Start up servers
+	<p> On VM B run spawnServers to create n (number of ips in destination.ips) servers running in the background:
+
+		./spawnServers -s Destination.ips
+	<p>
+
+1.	Connect clients to servers
+	<p> On VM A run connectClients to generate traffic between the two VMs for a user specified amount of time (in seconds). For this example the clients will talk to the servers for 60 seconds and the default bandwidth between the connections will be used:
+
+		./connectClients -c Destination.ips Source.ips 60
+	<p>
+
+Note: After the user is done running tests the servers will still be up and running on VM B. The user should kill all iperf processes once they are done:
+
+	sudo kill all -9 iperf
+<p> 

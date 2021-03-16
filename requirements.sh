@@ -9,3 +9,7 @@ sudo apt-get install iperf
 sudo apt-get install ifupdown net-tools
 
 sudo apt install cmake
+sudo apt-get install git
+
+sudo apt-get update -y
+sudo apt-get install -y nload
