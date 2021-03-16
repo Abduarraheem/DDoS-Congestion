@@ -104,6 +104,7 @@ for a user specified amount of time.
 		address 192.168.56.100
 		netmask 255.255.255.0
 
+
 	<p>Where enp0s3 is the default device and 192.168.56.100 will be
 	the static IP address of the default device (Note: If the user wants have a different IP address or they have a different device they wish to use they can just replace the device where enp0s3 appears and the ip address where 192.168.56.100 appears.). This process should be done on both server and client VMs and the two must have different static IP addresses.<p>
 	<p> After reboot the changes should be made. One thing to take note of this will completely isolate your VMs outside of the closed network.Once this process is completed the user is ready to run the project.
